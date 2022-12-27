@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: micro_admin
+    hostname: micro_admin
+    command: bash -c 'chmod 777 ./wait-for-it.sh &&./wait-for-it.sh -t 10 micro_db:3306  && pip install -r requirements.txt && python3 manage.py runserver 0.0.0.0:8000'
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - micro-network
+
+  db:
+    image: mysql:5.7.22
+    container_name: micro_db
+    hostname: micro_db
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=admin
+      - MYSQL_USER=linh
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root 
+    volumes:
+      - .dbdata:/var/lib/mysql
+    ports:
+      - 8001:3306
+    networks:
+      - micro-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: micro_spma
+    links:
+      - db
+    environment:
+      PMA_HOST: micro_db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8002:80
+    networks:
+      - micro-network
+
+networks:
+  micro-network:
+    driver: bridge
