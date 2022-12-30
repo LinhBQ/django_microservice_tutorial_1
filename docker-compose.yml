@@ -18,6 +18,14 @@ services:
     networks:
       - micro-network
 
+  queue:
+    command: 'python3 consumer.py'
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+
   db:
     image: mysql:5.7.22
     container_name: micro_db

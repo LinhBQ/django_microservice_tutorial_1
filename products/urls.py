@@ -9,7 +9,7 @@ urlpatterns = [
         'post': 'create'
     })),
     path('products/<str:pk>', ProductViewSet.as_view({
-        'get': 'retrieve',
+        'get': 'get',
         'put': 'update',
         'delete': 'delete'
     }))
